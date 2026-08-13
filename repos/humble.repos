@@ -1,0 +1,20 @@
+repositories:
+	mirs_mg5:
+		type: git
+		url: https://github.com/mirs260x/mirs260x.git
+		version: humble
+
+	mirs_msgs:
+		type: git
+		url: https://github.com/mirs260x/mirs_msgs.git
+		version: main
+
+	micro_ros_agent:
+		type: git
+		url: https://github.com/micro-ROS/micro-ROS-Agent.git
+		version: humble
+
+	sllidar_ros2:
+		type: git
+		url: https://github.com/Slamtec/sllidar_ros2.git
+		version: humble
