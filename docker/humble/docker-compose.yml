@@ -1,0 +1,34 @@
+name: mirs260x-humble
+
+services:
+  humble:
+    build: .
+    container_name: humble
+    privileged: true
+    network_mode: host
+    ipc: host
+    pid: host
+    group_add:
+      - dialout
+
+    environment:
+      - DISPLAY=${DISPLAY}
+      #- XAUTHORITY=${XAUTHORITY}
+      - XDG_RUNTIME_DIR=/tmp/runtime-root
+      - QT_X11_NO_MITSHM=1
+      - ROS_DOMAIN_ID=90
+
+    volumes:
+      - type: bind
+        source: "."
+        target: "/home/developer/mirsws"
+      - type: bind
+        source: "/tmp/.X11-unix"
+        target: "/tmp/.X11-unix"
+
+    devices:
+      - /dev:/dev
+
+    stdin_open: true
+    tty: true
+    command: bash
