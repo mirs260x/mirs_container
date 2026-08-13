@@ -1,9 +1,13 @@
 name: mirs260x-humble
 
 services:
-  humble:
-    build: .
-    container_name: humble
+  ros:
+    build:
+      context: .
+      args:
+        MIRS_UID: ${MIRS_UID:-1000}
+        MIRS_GID: ${MIRS_GID:-1000}
+    container_name: mirs260x-humble
     privileged: true
     network_mode: host
     ipc: host
@@ -20,8 +24,8 @@ services:
 
     volumes:
       - type: bind
-        source: "."
-        target: "/home/developer/mirsws"
+        source: ${MIRS_WORKSPACE:?MIRS_WORKSPACE is required}
+        target: /home/developer/mirsws
       - type: bind
         source: "/tmp/.X11-unix"
         target: "/tmp/.X11-unix"

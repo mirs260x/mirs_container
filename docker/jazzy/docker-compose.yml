@@ -1,11 +1,14 @@
 name: mirs260x-jazzy
 
 services:
-  jazzy:
+  ros:
     build:
       context: .
       network: host
-    container_name: jazzy
+      args:
+        MIRS_UID: ${MIRS_UID:-1000}
+        MIRS_GID: ${MIRS_GID:-1000}
+    container_name: mirs260x-jazzy
     privileged: true
     network_mode: host
     ipc: host
@@ -20,14 +23,11 @@ services:
 
     volumes:
       - type: bind
-        source: "./src"
-        target: "/home/developer/ws/src"
+        source: ${MIRS_WORKSPACE:?MIRS_WORKSPACE is required}
+        target: "/home/developer/ws"
       - type: bind
         source: "/tmp/.X11-unix"
         target: "/tmp/.X11-unix"
-      - build-vol:/ws/build
-      - install-vol:/ws/install
-      - log-vol:/mirsws/log
 
     devices:
       - /dev:/dev
@@ -35,8 +35,3 @@ services:
     stdin_open: true
     tty: true
     command: bash
-
-volumes:
-  build-vol:
-  install-vol:
-  log-vol:

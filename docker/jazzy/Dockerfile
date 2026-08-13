@@ -7,29 +7,26 @@ RUN apt-get update && \
     build-essential \
     cmake \
     git \
+    sudo \
+    python3-vcstool \
     vim \
     usbutils \
     x11-apps \
     libcanberra-gtk-module \
     libcanberra-gtk3-module
 
-ARG UID=1000
-ARG GID=1000
+ARG MIRS_UID=1000
+ARG MIRS_GID=1000
 ARG USERNAME=developer
 
 RUN userdel -r ubuntu && \
-		groupadd -g ${GID} ${USERNAME} && \
-    useradd -m -u ${UID} -g ${GID} -s /bin/bash ${USERNAME} && \
+		groupadd -g ${MIRS_GID} ${USERNAME} && \
+    useradd -m -u ${MIRS_UID} -g ${MIRS_GID} -s /bin/bash ${USERNAME} && \
 		echo "${USERNAME} ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/${USERNAME} && \
 		chmod 0440 /etc/sudoers.d/${USERNAME}
 
 USER ${USERNAME}
 WORKDIR /home/${USERNAME}/ws
-
-# copy package.xml and execute rosdep update and rosdep install
-COPY ./src /home/${USERNAME}/ws/src
-RUN rosdep update
-RUN rosdep install --from-paths src --ignore-src -r -y
 
 RUN echo "source /opt/ros/jazzy/setup.bash" >> /home/${USERNAME}/.bashrc && \
 		echo "source install/setup.bash" >> /home/${USERNAME}/.bashrc && \

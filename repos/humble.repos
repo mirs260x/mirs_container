@@ -1,7 +1,7 @@
 repositories:
-	mirs_mg5:
+	mirs:
 		type: git
-		url: https://github.com/mirs260x/mirs260x_base.git
+		url: https://github.com/mirs260x/mirs260x-base.git
 		version: humble
 
 	mirs_msgs:

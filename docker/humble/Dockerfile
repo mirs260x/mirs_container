@@ -7,6 +7,8 @@ RUN apt-get update && \
     build-essential \
     cmake \
     git \
+    sudo \
+    python3-vcstool \
     vim \
     usbutils \
     x11-apps \
@@ -28,12 +30,12 @@ ENV PYTHONPATH=/opt/ros/humble/lib/python3.10/site-packages:$PYTHONPATH
 ENV ROS_PYTHON_VERSION=3
 ENV ROS_VERSION=2
 
-ARG UID=1000
-ARG GID=1000
+ARG MIRS_UID=1000
+ARG MIRS_GID=1000
 ARG USERNAME=developer
 
-RUN groupadd -g ${GID} ${USERNAME} && \
-    useradd -m -u ${UID} -g ${GID} -s /bin/bash ${USERNAME} && \
+RUN groupadd -g ${MIRS_GID} ${USERNAME} && \
+    useradd -m -u ${MIRS_UID} -g ${MIRS_GID} -s /bin/bash ${USERNAME} && \
     usermod -aG dialout ${USERNAME} && \
 		echo "${USERNAME} ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/${USERNAME} && \
 		chmod 0440 /etc/sudoers.d/${USERNAME}
