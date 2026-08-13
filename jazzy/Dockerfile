@@ -19,7 +19,7 @@ ARG MIRS_UID=1000
 ARG MIRS_GID=1000
 ARG USERNAME=developer
 
-RUN userdel -r ubuntu && \
+RUN if id ubuntu >/dev/null 2>&1; then userdel -r ubuntu; fi && \
 		groupadd -g ${MIRS_GID} ${USERNAME} && \
     useradd -m -u ${MIRS_UID} -g ${MIRS_GID} -s /bin/bash ${USERNAME} && \
 		echo "${USERNAME} ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/${USERNAME} && \
@@ -29,7 +29,7 @@ USER ${USERNAME}
 WORKDIR /home/${USERNAME}/ws
 
 RUN echo "source /opt/ros/jazzy/setup.bash" >> /home/${USERNAME}/.bashrc && \
-		echo "source install/setup.bash" >> /home/${USERNAME}/.bashrc && \
+		echo "[ -f install/setup.bash ] && source install/setup.bash" >> /home/${USERNAME}/.bashrc && \
     echo 'export PS1="\[\e[32m\]\u@mirs-sim\[\e[m\]:\[\e[34m\]\w\[\e[m\]\\$ "' >> /home/${USERNAME}/.bashrc && \
 		echo "export RCUTILS_COLORIZED_OUTPUT=1" >> /home/${USERNAME}/.bashrc && \
     echo "alias cb='colcon build --symlink-install'" >> /home/${USERNAME}/.bashrc && \

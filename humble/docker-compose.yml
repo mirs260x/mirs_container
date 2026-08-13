@@ -1,18 +1,19 @@
-name: mirs260x-jazzy
+name: mirs260x-humble
 
 services:
   ros:
     build:
       context: .
-      network: host
       args:
         MIRS_UID: ${MIRS_UID:-1000}
         MIRS_GID: ${MIRS_GID:-1000}
-    container_name: mirs260x-jazzy
+    container_name: mirs260x-humble
     privileged: true
     network_mode: host
     ipc: host
     pid: host
+    group_add:
+      - dialout
 
     environment:
       - DISPLAY=${DISPLAY}
@@ -23,8 +24,10 @@ services:
 
     volumes:
       - type: bind
-        source: ${MIRS_WORKSPACE:?MIRS_WORKSPACE is required}
-        target: "/home/developer/ws"
+        # Compose resolves relative bind paths from this file's directory.
+        # Override with MIRS_WORKSPACE when using a workspace elsewhere.
+        source: ${MIRS_WORKSPACE:-../..}
+        target: /home/developer/mirsws
       - type: bind
         source: "/tmp/.X11-unix"
         target: "/tmp/.X11-unix"
