@@ -23,9 +23,7 @@ services:
 
     volumes:
       - type: bind
-        # Compose resolves relative bind paths from this file's directory.
-        # Override with MIRS_WORKSPACE when using a workspace elsewhere.
-        source: ${MIRS_WORKSPACE:-../..}
+        source: ../..
         target: "/home/developer/ws"
       - type: bind
         source: "/tmp/.X11-unix"

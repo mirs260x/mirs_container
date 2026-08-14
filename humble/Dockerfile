@@ -41,7 +41,7 @@ RUN groupadd -g ${MIRS_GID} ${USERNAME} && \
 		chmod 0440 /etc/sudoers.d/${USERNAME}
 
 USER ${USERNAME}
-WORKDIR /home/${USERNAME}/mirsws
+WORKDIR /home/${USERNAME}/ws
 
 
 RUN echo "source /opt/ros/humble/setup.bash" >> /home/${USERNAME}/.bashrc && \
