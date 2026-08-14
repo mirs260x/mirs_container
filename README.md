@@ -2,19 +2,25 @@
 
 MIRS 260x 用の ROS 2 Docker 開発環境です。このREADMEでは、コンテナの操作とコンテナ内エイリアスだけを説明します。
 
+RViz や rqt を使うネイティブLinux環境では、起動前にX11転送を許可します。
+```bash
+xhost +local:
+```
+
 ## 起動
 
 ```bash
+# git cloneはワークスペース直下で
+cd mirs_workspace
+git clone https://github.com/mirs260x/mirs_container.git
+# 起動時には目的のディストリビューションのディレクトリに入ってください。
 cd mirs_workspace/mirs_container/jazzy
+# イメージのビルド
 docker compose build
+# コンテナの立ち上げ
 docker compose up -d
+# コンテナの中に入る
 docker compose exec ros bash
-```
-
-RViz や rqt を使うLinux環境では、起動前にX11転送を許可します。
-
-```bash
-xhost +local:
 ```
 
 ## コンテナ内エイリアス
@@ -31,21 +37,15 @@ xhost +local:
 | `slam` | `ros2 launch mirs slam.launch.py` |
 | `nav` | `ros2 launch mirs nav.launch.py` |
 
-```bash
-cd /home/developer/ws
-ru
-ri
-cb
-si
-mirs
-```
 
 ROS 2パッケージの使い方は [mirs](https://github.com/mirs260x/mirs) を参照してください。
 
 ## 終了
 
 ```bash
+# コンテナから出る
 exit
+# コンテナを終了、削除
 docker compose down
 xhost -local:
 ```
