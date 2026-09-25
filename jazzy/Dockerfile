@@ -13,11 +13,17 @@ RUN apt-get update && \
     usbutils \
     x11-apps \
     libcanberra-gtk-module \
-    libcanberra-gtk3-module
+    libcanberra-gtk3-module \
+    python3-pip \
+    ros-jazzy-rmw-cyclonedds-cpp \
+    ros-jazzy-nav2-bringup \
+    ros-jazzy-navigation2 && \
+    pip3 install --no-cache-dir --break-system-packages dbus-fast bleak
 
 ARG MIRS_UID=1000
 ARG MIRS_GID=1000
 ARG USERNAME=developer
+ARG ROS_DOMAIN_ID=90
 
 RUN if id ubuntu >/dev/null 2>&1; then userdel -r ubuntu; fi && \
 		groupadd -g ${MIRS_GID} ${USERNAME} && \
@@ -29,7 +35,8 @@ USER ${USERNAME}
 WORKDIR /home/${USERNAME}/ws
 
 RUN echo "source /opt/ros/jazzy/setup.bash" >> /home/${USERNAME}/.bashrc && \
-		echo "[ -f install/setup.bash ] && source install/setup.bash" >> /home/${USERNAME}/.bashrc && \
+		echo "export ROS_DOMAIN_ID=${ROS_DOMAIN_ID}" >> ~/.bashrc && \
+	 	echo "[ -f install/setup.bash ] && source install/setup.bash" >> /home/${USERNAME}/.bashrc && \
     echo 'export PS1="\[\e[32m\]\u@mirs-sim\[\e[m\]:\[\e[34m\]\w\[\e[m\]\\$ "' >> /home/${USERNAME}/.bashrc && \
 		echo "export RCUTILS_COLORIZED_OUTPUT=1" >> /home/${USERNAME}/.bashrc && \
     echo "alias cb='colcon build --symlink-install'" >> /home/${USERNAME}/.bashrc && \
