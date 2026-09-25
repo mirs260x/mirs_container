@@ -11,10 +11,15 @@ ROS 2開発コンテナ（humble / jazzy）定義。
 
 ```bash
 cd jazzy   # または humble
-docker compose build
+docker compose build               # ros サービス (baseステージ)
+docker compose --profile coverage build   # coverage サービス (依存焼き込み)
 ```
 
 ## 注意
 
-- aptパッケージ追加時は `Dockerfile` の一覧を更新する（現状: `ros-jazzy-fields2cover` まで導入済み）
-- opennav_coverageはソース導入（jazzy-v2ブランチ）。手順は `coverage` パッケージのDESIGN.md参照
+- aptパッケージ追加時は `Dockerfile` の一覧を更新する
+- coverage用依存 (opennav_coverage + Fields2Cover v2) は `coverage`
+  ステージで `/opt/deps` に焼き込む。ws側へのcloneは不要。
+  バージョン固定はbuild args (`OPENNAV_BRANCH`, `F2C_TAG`) で上書き可
+- 起動: 通常は `docker compose up -d`、カバレージ用は
+  `docker compose --profile coverage up -d coverage`

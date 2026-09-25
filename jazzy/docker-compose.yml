@@ -1,37 +1,65 @@
 name: mirs260x-jazzy
 
+x-mirs-common: &mirs-common
+  privileged: true
+  network_mode: host
+  ipc: host
+  pid: host
+
+  environment:
+    - DISPLAY=${DISPLAY}
+    #- XAUTHORITY=${XAUTHORITY}
+    - XDG_RUNTIME_DIR=/tmp/runtime-root
+    - QT_X11_NO_MITSHM=1
+    - ROS_DOMAIN_ID=90
+
+  volumes:
+    - type: bind
+      source: ../..
+      target: "/home/developer/ws"
+    - type: bind
+      source: "/tmp/.X11-unix"
+      target: "/tmp/.X11-unix"
+    - type: bind
+      source: "/run/dbus/system_bus_socket"
+      target: "/run/dbus/system_bus_socket"
+    - type: bind
+      source: "/var/run/dbus/system_bus_socket"
+      target: "/var/run/dbus/system_bus_socket"
+
+  devices:
+    - /dev:/dev
+
+  stdin_open: true
+  tty: true
+  command: bash
+
 services:
+  # 汎用dev環境 (opennavなし)。通常はこちら
   ros:
+    <<: *mirs-common
     build:
       context: .
+      target: base
       network: host
       args:
         MIRS_UID: ${MIRS_UID:-1000}
         MIRS_GID: ${MIRS_GID:-1000}
     container_name: mirs260x-jazzy
-    privileged: true
-    network_mode: host
-    ipc: host
-    pid: host
 
-    environment:
-      - DISPLAY=${DISPLAY}
-      #- XAUTHORITY=${XAUTHORITY}
-      - XDG_RUNTIME_DIR=/tmp/runtime-root
-      - QT_X11_NO_MITSHM=1
-      - ROS_DOMAIN_ID=90
-
-    volumes:
-      - type: bind
-        source: ../..
-        target: "/home/developer/ws"
-      - type: bind
-        source: "/tmp/.X11-unix"
-        target: "/tmp/.X11-unix"
-
-    devices:
-      - /dev:/dev
-
-    stdin_open: true
-    tty: true
-    command: bash
+  # カバレージ走行用 (opennav_coverage + Fields2Cover v2 焼き込み)。
+  # ws側へのcloneは不要 (/opt/deps として解決される)。
+  # 使うときだけ: docker compose --profile coverage up -d
+  coverage:
+    <<: *mirs-common
+    profiles: ["coverage"]
+    build:
+      context: .
+      target: coverage
+      network: host
+      args:
+        MIRS_UID: ${MIRS_UID:-1000}
+        MIRS_GID: ${MIRS_GID:-1000}
+        OPENNAV_BRANCH: ${OPENNAV_BRANCH:-jazzy-v2}
+        F2C_TAG: ${F2C_TAG:-v2.0.0}
+    container_name: mirs260x-jazzy-coverage
