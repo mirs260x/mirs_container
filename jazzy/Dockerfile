@@ -14,11 +14,17 @@ RUN apt-get update && \
     x11-apps \
     libcanberra-gtk-module \
     libcanberra-gtk3-module \
-    python3-pip \
-    ros-jazzy-rmw-cyclonedds-cpp \
-    ros-jazzy-nav2-bringup \
-    ros-jazzy-navigation2 && \
+    python3-pip && \
     pip3 install --no-cache-dir --break-system-packages dbus-fast bleak
+
+# Install ROS dependencies declared in package.xml files via rosdep
+# NOTE: thirdpartyも含めてCOPYすること。src/originalだけだと
+# micro_ros_agent / sllidar_ros2 / opennav_coverage 等がソース内に無く
+# rosdepがapt解決しようとして失敗する (--ignore-srcで無視できないため)。
+COPY src /tmp/ros_src
+RUN rosdep update && \
+    rosdep install --from-paths /tmp/ros_src --ignore-src -r -y && \
+    rm -rf /tmp/ros_src
 
 ARG MIRS_UID=1000
 ARG MIRS_GID=1000
@@ -47,6 +53,7 @@ RUN echo "source /opt/ros/jazzy/setup.bash" >> /home/${USERNAME}/.bashrc && \
     echo "alias si='source install/setup.bash'" >> /home/${USERNAME}/.bashrc && \
     echo "alias mirs='ros2 launch mirs mirs.launch.py'" >> /home/${USERNAME}/.bashrc && \
     echo "alias slam='ros2 launch mirs slam.launch.py'" >> /home/${USERNAME}/.bashrc && \
-    echo "alias nav='ros2 launch mirs nav.launch.py'" >> /home/${USERNAME}/.bashrc
+    echo "alias nav='ros2 launch mirs nav.launch.py'" >> /home/${USERNAME}/.bashrc && \
+    echo "savemap() { ros2 run nav2_map_server map_saver_cli -f \"/home/${USERNAME}/ws/src/original/mirs/maps/\$1\" --ros-args -p map_subscribe_transient_local:=true -p save_map_timeout:=10.0; }" >> /home/${USERNAME}/.bashrc
 
 CMD ["bash"]

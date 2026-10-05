@@ -9,6 +9,7 @@ RUN apt-get update && \
     git \
     sudo \
     python3-vcstool \
+    python3-rosdep \
     vim \
     usbutils \
     x11-apps \
@@ -20,6 +21,13 @@ RUN apt-get update && \
 		ros-humble-realsense2-description \
 		ros-humble-rtabmap \
 		ros-humble-rtabmap-ros
+
+# package.xml宣言を正本とする。apt直書きは最小限に留め、不足分はrosdepで補う。
+# NOTE: thirdparty含むsrc全体をCOPYしないと --ignore-src が効かず失敗する。
+COPY src /tmp/ros_src
+RUN rosdep update && \
+    rosdep install --from-paths /tmp/ros_src --ignore-src -r -y && \
+    rm -rf /tmp/ros_src
 
 ENV ROS_DISTRO=humble
 ENV AMENT_PREFIX_PATH=/opt/ros/humble
@@ -46,7 +54,7 @@ WORKDIR /home/${USERNAME}/ws
 
 RUN echo "source /opt/ros/humble/setup.bash" >> /home/${USERNAME}/.bashrc && \
 		echo "export RCUTILS_COLORIZED_OUTPUT=1" >> /home/${USERNAME}/.bashrc && \
-    echo 'export PS0="\[\e[32m\]\u@mirs-sim\[\e[m\]:\[\e[34m\]\w\[\e[m\]\\$ "' >> /home/${USERNAME}/.bashrc && \
+    echo 'export PS1="\[\e[32m\]\u@mirs-sim\[\e[m\]:\[\e[34m\]\w\[\e[m\]\\$ "' >> /home/${USERNAME}/.bashrc && \
     echo "alias cb='colcon build --symlink-install'" >> /home/${USERNAME}/.bashrc && \
     echo "alias cbs='colcon build --symlink-install --packages-select'" >> /home/${USERNAME}/.bashrc && \
     echo "alias cbt='colcon build --symlink-install --packages-up-to'" >> /home/${USERNAME}/.bashrc && \
@@ -55,6 +63,7 @@ RUN echo "source /opt/ros/humble/setup.bash" >> /home/${USERNAME}/.bashrc && \
     echo "alias si='source install/setup.bash'" >> /home/${USERNAME}/.bashrc && \
     echo "alias mirs='ros2 launch mirs mirs.launch.py'" >> /home/${USERNAME}/.bashrc && \
     echo "alias slam='ros2 launch mirs slam.launch.py'" >> /home/${USERNAME}/.bashrc && \
-    echo "alias nav='ros2 launch mirs nav.launch.py'" >> /home/${USERNAME}/.bashrc
+    echo "alias nav='ros2 launch mirs nav.launch.py'" >> /home/${USERNAME}/.bashrc && \
+    echo "savemap() { ros2 run nav2_map_server map_saver_cli -f \"/home/${USERNAME}/ws/src/original/mirs/maps/\$1\" --ros-args -p map_subscribe_transient_local:=true -p save_map_timeout:=10.0; }" >> /home/${USERNAME}/.bashrc
 
 CMD ["bash"]
