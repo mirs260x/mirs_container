@@ -16,6 +16,7 @@ ARG GID=1000
 ARG USERNAME=developer
 ARG ROS_DOMAIN_ID=90
 
+# ubuntu 24.04からはデフォルトでubuntuユーザーがuid1000で存在するため一度消す
 RUN deluser ubuntu && \
 		groupadd -g ${GID} ${USERNAME} && \
     useradd -m -u ${UID} -g ${GID} -s /bin/bash ${USERNAME} && \
