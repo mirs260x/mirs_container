@@ -4,9 +4,6 @@ services:
   ros:
     build:
       context: .
-      args:
-        MIRS_UID: ${MIRS_UID:-1000}
-        MIRS_GID: ${MIRS_GID:-1000}
     container_name: mirs260x-humble
     privileged: true
     network_mode: host
@@ -24,10 +21,8 @@ services:
 
     volumes:
       - type: bind
-        # Compose resolves relative bind paths from this file's directory.
-        # Override with MIRS_WORKSPACE when using a workspace elsewhere.
-        source: ${MIRS_WORKSPACE:-../..}
-        target: /home/developer/ws
+        source: ../..
+        target: "/home/developer/ws"
       - type: bind
         source: "/tmp/.X11-unix"
         target: "/tmp/.X11-unix"

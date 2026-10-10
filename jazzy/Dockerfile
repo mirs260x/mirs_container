@@ -8,32 +8,18 @@ RUN apt-get update && \
     cmake \
     git \
     sudo \
-    python3-vcstool \
     vim \
-    usbutils \
-    x11-apps \
-    libcanberra-gtk-module \
-    libcanberra-gtk3-module \
-    python3-pip && \
-    pip3 install --no-cache-dir --break-system-packages dbus-fast bleak
+    usbutils
 
-# Install ROS dependencies declared in package.xml files via rosdep
-# NOTE: thirdpartyも含めてCOPYすること。src/originalだけだと
-# micro_ros_agent / sllidar_ros2 / opennav_coverage 等がソース内に無く
-# rosdepがapt解決しようとして失敗する (--ignore-srcで無視できないため)。
-COPY src /tmp/ros_src
-RUN rosdep update && \
-    rosdep install --from-paths /tmp/ros_src --ignore-src -r -y && \
-    rm -rf /tmp/ros_src
-
-ARG MIRS_UID=1000
-ARG MIRS_GID=1000
+ARG UID=1000
+ARG GID=1000
 ARG USERNAME=developer
 ARG ROS_DOMAIN_ID=90
 
-RUN if id ubuntu >/dev/null 2>&1; then userdel -r ubuntu; fi && \
-		groupadd -g ${MIRS_GID} ${USERNAME} && \
-    useradd -m -u ${MIRS_UID} -g ${MIRS_GID} -s /bin/bash ${USERNAME} && \
+RUN deluser ubuntu && \
+		groupadd -g ${GID} ${USERNAME} && \
+    useradd -m -u ${UID} -g ${GID} -s /bin/bash ${USERNAME} && \
+    usermod -aG dialout ${USERNAME} && \
 		echo "${USERNAME} ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/${USERNAME} && \
 		chmod 0440 /etc/sudoers.d/${USERNAME}
 
@@ -51,9 +37,10 @@ RUN echo "source /opt/ros/jazzy/setup.bash" >> /home/${USERNAME}/.bashrc && \
     echo "alias ru='rosdep update'" >> /home/${USERNAME}/.bashrc && \
     echo "alias ri='rosdep install --from-path src --ignore-src -r -y'" >> /home/${USERNAME}/.bashrc && \
     echo "alias si='source install/setup.bash'" >> /home/${USERNAME}/.bashrc && \
-    echo "alias mirs='ros2 launch mirs mirs.launch.py'" >> /home/${USERNAME}/.bashrc && \
-    echo "alias slam='ros2 launch mirs slam.launch.py'" >> /home/${USERNAME}/.bashrc && \
-    echo "alias nav='ros2 launch mirs nav.launch.py'" >> /home/${USERNAME}/.bashrc && \
+    echo "alias mirs='ros2 launch mirs mirs_launch.py'" >> /home/${USERNAME}/.bashrc && \
+    echo "alias slam='ros2 launch mirs slam_launch.py'" >> /home/${USERNAME}/.bashrc && \
+    echo "alias nav='ros2 launch mirs nav_launch.py'" >> /home/${USERNAME}/.bashrc && \
+    echo "alias bagrec='ros2 bag record /imu/data_raw /imu/mag /scan /odom /tf /tf_static /cmd_vel -o field_\$(date +%F_%H%M)'" >> /home/${USERNAME}/.bashrc && \
     echo "savemap() { ros2 run nav2_map_server map_saver_cli -f \"/home/${USERNAME}/ws/src/original/mirs/maps/\$1\" --ros-args -p map_subscribe_transient_local:=true -p save_map_timeout:=10.0; }" >> /home/${USERNAME}/.bashrc
 
 CMD ["bash"]
