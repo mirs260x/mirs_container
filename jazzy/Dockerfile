@@ -7,9 +7,14 @@ RUN apt-get update && \
     build-essential \
     cmake \
     git \
+    python3-rosdep \
     sudo \
     vim \
-    usbutils
+    usbutils \
+    python3-dbus-fast \
+    xterm
+
+RUN if [ ! -f /etc/ros/rosdep/sources.list.d/20-default.list ]; then rosdep init; fi
 
 ARG UID=1000
 ARG GID=1000
@@ -36,7 +41,7 @@ RUN echo "source /opt/ros/jazzy/setup.bash" >> /home/${USERNAME}/.bashrc && \
     echo "alias cbs='colcon build --symlink-install --packages-select'" >> /home/${USERNAME}/.bashrc && \
     echo "alias cbt='colcon build --symlink-install --packages-up-to'" >> /home/${USERNAME}/.bashrc && \
     echo "alias ru='rosdep update'" >> /home/${USERNAME}/.bashrc && \
-    echo "alias ri='rosdep install --from-path src --ignore-src -r -y'" >> /home/${USERNAME}/.bashrc && \
+    echo "alias ri='rosdep install --from-paths src --ignore-src --rosdistro jazzy -r -y'" >> /home/${USERNAME}/.bashrc && \
     echo "alias si='source install/setup.bash'" >> /home/${USERNAME}/.bashrc && \
     echo "alias mirs='ros2 launch mirs mirs_launch.py'" >> /home/${USERNAME}/.bashrc && \
     echo "alias slam='ros2 launch mirs slam_launch.py'" >> /home/${USERNAME}/.bashrc && \
