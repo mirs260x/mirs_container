@@ -4,15 +4,13 @@ services:
   ros:
     build:
       context: .
-      network: host
-      args:
-        MIRS_UID: ${MIRS_UID:-1000}
-        MIRS_GID: ${MIRS_GID:-1000}
     container_name: mirs260x-jazzy
     privileged: true
     network_mode: host
     ipc: host
     pid: host
+    group_add:
+      - dialout
 
     environment:
       - DISPLAY=${DISPLAY}

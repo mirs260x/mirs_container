@@ -21,6 +21,10 @@ docker compose build
 docker compose up -d
 # コンテナの中に入る
 docker compose exec ros bash
+# ソース内の package.xml にある依存を rosdep でインストール
+cd /home/developer/ws
+rosdep update
+rosdep install --from-paths src --ignore-src --rosdistro jazzy -r -y
 ```
 
 ## コンテナ内エイリアス
@@ -28,7 +32,7 @@ docker compose exec ros bash
 | エイリアス | 実体 |
 |---|---|
 | `ru` | `rosdep update` |
-| `ri` | `rosdep install --from-path src --ignore-src -r -y` |
+| `ri` | `rosdep install --from-paths src --ignore-src --rosdistro jazzy -r -y` |
 | `cb` | `colcon build --symlink-install` |
 | `cbs` | `colcon build --symlink-install --packages-select` |
 | `cbt` | `colcon build --symlink-install --packages-up-to` |
